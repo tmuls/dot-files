@@ -28,9 +28,18 @@ startup_message off
 # show messages (e.g. "Window 0 (sh) killed.") for 2s instead of the default 5s
 msgwait 2
 
-# keep window names (e.g. "sh") instead of letting the shell prompt rename
-# them to user@host:dir (Fedora's /etc/bashrc does this for TERM=screen*)
-defdynamictitle off
+# 24-bit color passthrough (Konsole supports it); without this screen 5
+# squashes colors to the 256-color palette
+truecolor on
+# fill cleared areas with the current background color, like a normal
+# terminal (keeps colored backgrounds, e.g. diff lines, from looking patchy)
+defbce on
+
+# dynamic window titles: each window is named after the command running in
+# it (vim, claude, ...) and goes back to "sh" at the prompt. The shell sends
+# the titles, see .bashrc.d/git-prompt.sh
+defdynamictitle on
+shelltitle sh
 
 #defflow on # will force screen to process ^S/^Q
 #deflogin on
@@ -133,7 +142,7 @@ defnonblock 5
 # screen -t daemon 9 tail -f /var/log/daemon.log
 
 
-screen -t sh
-screen -t sh
-screen -t sh
+screen
+screen
+screen
 select 0 
