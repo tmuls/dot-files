@@ -24,7 +24,13 @@
 #shell -$SHELL
 
 startup_message off
-nethack on
+
+# show messages (e.g. "Window 0 (sh) killed.") for 2s instead of the default 5s
+msgwait 2
+
+# keep window names (e.g. "sh") instead of letting the shell prompt rename
+# them to user@host:dir (Fedora's /etc/bashrc does this for TERM=screen*)
+defdynamictitle off
 
 #defflow on # will force screen to process ^S/^Q
 #deflogin on
@@ -47,7 +53,10 @@ bind ^k
 bind ^\
 # Make them better
 bind \\ quit
-bind K kill
+# screen 5's kill no longer asks first, so recreate the y/n prompt
+bind K eval 'command -c killconfirm' 'echo "Really kill this window [y/n]"'
+bind -c killconfirm y kill
+bind -c killconfirm Y kill
 #bind I login on
 #bind O login off
 bind } history
@@ -80,9 +89,14 @@ termcapinfo xterm*|rxvt*|kterm*|Eterm* hs:ts=\E]0;:fs=\007:ds=\E]0;\007
 #hardstatus on
 #hardstatus alwayslastline
 #hardstatus string "%{.bW}%-w%{.rW}%n %t%{-}%+w %=%{..G} %H %{..Y} %m/%d %C%a "
-hardstatus on
-hardstatus alwayslastline
-hardstatus string 'MAC %{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %m-%d%{W} %c %{g}]'
+# screen 5 color syntax: fg;bg as numbers (0-7 ANSI, 8-15 bright)
+# 1=red 2=green 7=white 10=bright green 12=bright blue 15=bright white
+# note: screen 5 misplaces colors if the text right before %= is empty, hence the
+# space after %+Lw (needed when the last window is selected); %f adds the *
+# status bar lives in the caption line; the hardstatus line below it is left
+# blank and used only for messages, so they never cover the bar
+caption always '%{= 10;0}[ %{10;0}%H %{2;0}][%= %{= 7;0}%-Lw%{1;0}(%{15;0}%n%f%t%?(%u)%?%{1;0})%{7;0}%+Lw %= %{2;0}][%{12;0} %m-%d%{15;0} %c %{2;0}]'
+hardstatus alwayslastline ''
 
 defscrollback 4000 
 
@@ -119,11 +133,6 @@ defnonblock 5
 # screen -t daemon 9 tail -f /var/log/daemon.log
 
 
-screen -t sh
-screen -t sh
-screen -t sh
-screen -t sh
-screen -t sh
 screen -t sh
 screen -t sh
 screen -t sh
